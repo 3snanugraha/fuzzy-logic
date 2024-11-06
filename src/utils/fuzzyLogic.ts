@@ -1,5 +1,3 @@
-// utils/fuzzyLogic.ts
-
 interface FuzzyResult {
   low?: number;
   medium?: number;
@@ -11,9 +9,8 @@ interface FuzzyRule {
   degree: number;
 }
 
-// Fungsi untuk menghitung keanggotaan fuzzy
 function fuzzyMembership(value: number, low: number, medium: number, high: number): FuzzyResult {
-  let result: FuzzyResult = {};
+  const result: FuzzyResult = {};
 
   if (value <= low) result.low = 1;
   else if (value <= medium) result.low = (medium - value) / (medium - low);
@@ -27,84 +24,124 @@ function fuzzyMembership(value: number, low: number, medium: number, high: numbe
   if (value >= high) result.high = 1;
   else if (value >= medium) result.high = (value - medium) / (high - medium);
   else result.high = 0;
-
   return result;
 }
 
-// Fungsi untuk mengategorikan variabel input sesuai dengan rentang yang ditentukan
 function categorizeUmur(usia: number): FuzzyResult {
-  // Misalnya, kategori umur: 20-30 Rendah, 30-50 Sedang, >50 Tinggi
-  return fuzzyMembership(usia, 20, 35, 50);
+  // Age ranges: 20-30-42 (low), 30-42-50 (medium), 42-50-60 (high)
+  return fuzzyMembership(usia, 30, 42, 50);
 }
 
 function categorizeTekananDarah(tekananDarah: string): FuzzyResult {
-  // Misalnya, tekanan darah: Rendah = <90, Sedang = 90-120, Tinggi = >120
-  const [systolic, diastolic] = tekananDarah.split('/').map(Number);
-  return fuzzyMembership(systolic, 90, 120, 140); // Berdasarkan tekanan sistolik
+  const [systolic] = tekananDarah.split('/').map(Number);
+  // Blood pressure ranges:
+  // Low: 70/40-90/60-100/70
+  // Medium: 90/60-100/70-120/80
+  // High: 100/70-120/80-140/90
+  return fuzzyMembership(systolic, 90, 120, 140);
 }
 
 function categorizeKolesterol(kolesterol: number): FuzzyResult {
-  // Kolesterol: Rendah <200, Sedang = 200-240, Tinggi >240
-  return fuzzyMembership(kolesterol, 200, 220, 240);
+  // Cholesterol ranges:
+  // Low: 100-200-240 mg/dL
+  // Medium: 200-240-245 mg/dL
+  // High: 240-245-250 mg/dL
+  return fuzzyMembership(kolesterol, 200, 240, 245);
 }
 
 function categorizeBMI(bmi: number): FuzzyResult {
-  // BMI: Rendah <18.5, Normal = 18.5-24.9, Tinggi >24.9
-  return fuzzyMembership(bmi, 18.5, 22, 24.9);
+  // BMI ranges:
+  // Low: 0-18.5-24.9
+  // Medium: 18.5-24.9-30
+  // High: 24.9-30-40
+  return fuzzyMembership(bmi, 18.5, 24.9, 30);
 }
 
 function categorizeMerokok(merokok: number): FuzzyResult {
-  // Merokok: 0 = tidak merokok, 1-10 = rendah, 10-20 = sedang, >20 = tinggi
-  if (merokok === 0) return { low: 1 };
-  if (merokok <= 10) return { low: 1, medium: 0.5 }; // Kategori rendah
-  if (merokok <= 20) return { medium: 1 };
-  return { high: 1 }; // Kategori tinggi
+  // Smoking ranges:
+  // Low: 0-5-10
+  // Medium: 5-10-20
+  // High: 10-20-40
+  if (merokok <= 5) return { low: 1 };
+  if (merokok <= 10) return { low: (10 - merokok) / 5, medium: (merokok - 5) / 5 };
+  if (merokok <= 20) return { medium: (20 - merokok) / 10, high: (merokok - 10) / 10 };
+  return { high: 1 };
 }
 
-// Aturan fuzzy untuk menghitung risiko
 function fuzzyRules(input1: FuzzyResult, input2: FuzzyResult, input3: FuzzyResult, input4: FuzzyResult, input5: FuzzyResult): FuzzyRule[] {
   const rules: FuzzyRule[] = [];
+  
+  // Calculate membership degrees for each rule
+  const lowRiskDegree = Math.min(
+    input1.low || 0,
+    input2.low || 0,
+    input3.low || 0,
+    input4.low || 0,
+    input5.low || 0
+  );
 
-  // Kombinasikan input dan terapkan aturan fuzzy
-  const rule1 = Math.min(input1.low || 0, input2.low || 0, input3.low || 0, input4.low || 0, input5.low || 0);
-  const rule2 = Math.min(input1.medium || 0, input2.medium || 0, input3.medium || 0, input4.medium || 0, input5.medium || 0);
-  const rule3 = Math.min(input1.high || 0, input2.high || 0, input3.high || 0, input4.high || 0, input5.high || 0);
+  const mediumRiskDegree = Math.max(
+    Math.min(input1.medium || 0, input2.medium || 0),
+    Math.min(input2.medium || 0, input3.medium || 0),
+    Math.min(input3.medium || 0, input4.medium || 0),
+    Math.min(input4.medium || 0, input5.medium || 0)
+  );
 
-  rules.push({ value: 'low', degree: rule1 });
-  rules.push({ value: 'medium', degree: rule2 });
-  rules.push({ value: 'high', degree: rule3 });
+  const highRiskDegree = Math.max(
+    Math.min(input1.high || 0, input2.high || 0),
+    Math.min(input2.high || 0, input3.high || 0),
+    Math.min(input3.high || 0, input4.high || 0),
+    Math.min(input1.high || 0, input5.high || 0)
+  );
+
+  // Only add rules with non-zero degrees
+  if (lowRiskDegree > 0) {
+    rules.push({ value: 'low', degree: lowRiskDegree });
+  }
+  if (mediumRiskDegree > 0) {
+    rules.push({ value: 'medium', degree: mediumRiskDegree });
+  }
+  if (highRiskDegree > 0) {
+    rules.push({ value: 'high', degree: highRiskDegree });
+  }
+
+  // If no rules fired, return default medium risk
+  if (rules.length === 0) {
+    rules.push({ value: 'medium', degree: 1 });
+  }
 
   return rules;
 }
 
-// Defuzzifikasi menggunakan rata-rata tertimbang
 function defuzzification(rules: FuzzyRule[]): number {
-  let numerator: number = 0;
-  let denominator: number = 0;
+  let numerator = 0;
+  let denominator = 0;
 
-  rules.forEach((rule: FuzzyRule) => {
-    let crispValue: number;
-    if (rule.value === 'low') crispValue = 30;  // Rendah
-    else if (rule.value === 'medium') crispValue = 60;  // Sedang
-    else crispValue = 90;  // Tinggi
-
+  rules.forEach((rule) => {
+    const crispValue = rule.value === 'low' ? 20 : 
+                      rule.value === 'medium' ? 50 : 70;
+    
     numerator += rule.degree * crispValue;
     denominator += rule.degree;
   });
 
-  return denominator === 0 ? 0 : numerator / denominator;
-}
+  // Prevent division by zero and ensure valid output
+  if (denominator === 0) {
+    return 50;
+  }
 
-// Fungsi utama untuk menghitung keputusan fuzzy
+  const result = numerator / denominator;
+  
+  // Ensure result is within valid range
+  return Math.max(0, Math.min(100, result));
+}
 export function fuzzyDecision(usia: number, tekananDarah: string, kolesterol: number, bmi: number, merokok: number): number {
-  // Menghitung keanggotaan untuk setiap parameter
   const fuzzyUmur = categorizeUmur(usia);
   const fuzzyTekananDarah = categorizeTekananDarah(tekananDarah);
   const fuzzyKolesterol = categorizeKolesterol(kolesterol);
   const fuzzyBMI = categorizeBMI(bmi);
   const fuzzyMerokok = categorizeMerokok(merokok);
 
-  // Menerapkan aturan fuzzy dan menghitung hasil defuzzifikasi
   const rules = fuzzyRules(fuzzyUmur, fuzzyTekananDarah, fuzzyKolesterol, fuzzyBMI, fuzzyMerokok);
   return defuzzification(rules);
 }

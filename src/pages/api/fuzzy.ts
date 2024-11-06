@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('Reading Excel file...');
     
     // Correct path resolution using path.join for compatibility
-    const filePath = path.join(process.cwd(), 'public', 'data', 'data_pasien.xlsx');
+    const filePath = path.join(process.cwd(), 'public', 'data', 'data-pasien.xlsx');
     
     // Log file path for debugging purposes
     console.log('File path:', filePath);
@@ -34,11 +34,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Process patient data with fuzzy logic
     const results = patientData.map((patient, index) => {
-      const { usia, tekananDarah, kolesterol, bmi, merokok } = patient;
-      const result = fuzzyDecision(usia, tekananDarah, kolesterol, bmi, merokok);
-      return { id: index + 1, usia, tekananDarah, kolesterol, bmi, merokok, risiko: result };
+      const { usia, tekananDarah, kolesterol, bmi, merokok } = patient as { usia: string; tekananDarah: string; kolesterol: string; bmi: string; merokok: string };
+      const result = fuzzyDecision(
+        parseFloat(usia), 
+        tekananDarah, 
+        parseFloat(kolesterol), 
+        parseFloat(bmi), 
+        parseInt(merokok)
+      );
+      return { id: index, usia, tekananDarah, kolesterol, bmi, merokok, risiko: result };
     });
-
     console.log('Results:', results);
 
     // Sending the results back as JSON response
