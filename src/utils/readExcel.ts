@@ -10,18 +10,29 @@ export function readExcelFile(filePath: string): Promise<any[]> {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       
-      // Mengonversi sheet ke dalam bentuk array JSON
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      // Mengonversi sheet ke dalam bentuk array JSON (header: 0 berarti baris pertama adalah header)
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 0 });
       
-      // Menyaring data untuk digunakan dalam sistem
-      // Anda bisa menyesuaikan ini berdasarkan struktur kolom yang ada pada file Excel
-      const formattedData = jsonData.map((row: any) => ({
-        usia: row[0], // Usia pada kolom pertama
-        tekananDarah: row[1], // Tekanan darah pada kolom kedua
-        kolesterol: row[2], // Kolesterol pada kolom ketiga
-        bmi: row[3], // BMI pada kolom keempat
-        merokok: row[4], // Merokok pada kolom kelima
-      }));
+      // Validasi dan format data sesuai kebutuhan
+      const formattedData = jsonData.map((row: any) => {
+        // Pastikan setiap kolom ada dan sesuai tipe data yang diinginkan
+        const id = row['ID'] || 0; // Kolom "ID"
+        const usia = row['Usia'] || 0; // Kolom "Usia"
+        const tekananDarah = row['TekananDarah'] || 0; // Kolom "TekananDarah"
+        const kolesterol = row['Kolesterol'] || 0; // Kolom "Kolesterol"
+        const bmi = row['BMI'] || 0; // Kolom "BMI"
+        const merokok = row['Merokok'] || 0; // Kolom "Merokok"
+        
+        // Kembalikan data dalam format yang dibutuhkan
+        return {
+          id,
+          usia,
+          tekananDarah,
+          kolesterol,
+          bmi,
+          merokok,
+        };
+      });
 
       resolve(formattedData); // Mengembalikan data yang telah diformat
     } catch (error) {

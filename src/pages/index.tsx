@@ -1,44 +1,41 @@
-import { useState, FormEvent, ChangeEvent } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null); // State untuk file yang diupload
-  const [result, setResult] = useState<string | null>(null); // State untuk menyimpan hasil identifikasi
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State untuk toggle menu mobile
+  const [result, setResult] = useState<any[]>([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Fungsi untuk menangani submit form
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!file) {
-      alert("Pilih file Excel terlebih dahulu.");
-      return;
-    }
-
-    // Membuat form data untuk mengirimkan file
-    const formData = new FormData();
-    formData.append("file", file);
-
+  const fetchData = async () => {
     try {
-      // Mengirimkan permintaan POST ke API untuk memproses file
-      const res = await fetch('/api/fuzzy', {
-        method: 'POST',
-        body: formData,
-      });
+      console.log('Fetching data from /api/fuzzy...');
+      
+      const res = await fetch('/api/fuzzy');
+      
+      if (!res.ok) {
+        console.error('Failed to fetch data from API:', res.statusText);
+        return;
+      }
 
-      // Mengambil hasil dari API
       const data = await res.json();
-      if (res.ok) {
-        setResult(JSON.stringify(data.data)); // Menampilkan data hasil identifikasi
+      console.log('Data fetched successfully:', data);
+
+      if (data && data.data) {
+        setResult(data.data);
       } else {
-        setResult("Terjadi kesalahan saat memproses file.");
+        console.warn('No data returned from API');
+        setResult([]);
       }
     } catch (error) {
-      console.error("Error:", error);
-      setResult("Terjadi kesalahan jaringan.");
+      console.error('Error fetching data:', error);
     }
   };
 
+  useEffect(() => {
+    console.log('Component mounted, initiating data fetch...');
+    fetchData();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
       {/* Navigation */}
       <nav className="bg-white shadow-md px-4 py-3">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -49,11 +46,6 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-          </div>
-          <div className="hidden md:flex space-x-4">
-            <a href="#" className="text-gray-800 hover:text-blue-600">Home</a>
-            <a href="#" className="text-gray-800 hover:text-blue-600">About</a>
-            <a href="#" className="text-gray-800 hover:text-blue-600">Contact</a>
           </div>
         </div>
         {isMenuOpen && (
@@ -77,52 +69,52 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Form and Result Section */}
+      {/* Result Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Form Card */}
-          <div className="bg-white rounded-xl shadow-2xl p-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">Form Identifikasi</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="flex flex-col">
-                <label className="text-lg font-medium text-gray-700 mb-2">
-                  Upload File Excel:
-                  <input
-                    type="file"
-                    accept=".xlsx, .xls"
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      if (e.target.files?.length) {
-                        setFile(e.target.files[0]);
-                      }
-                    }}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </label>
-              </div>
-              <button
-                type="submit"
-                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition duration-300"
-              >
-                Identifikasi
-              </button>
-            </form>
-          </div>
-
-          {/* Result Card */}
-          <div className="bg-white rounded-xl shadow-2xl p-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">Hasil Identifikasi</h2>
-            {result !== null ? (
-              <div className="p-6 bg-gray-50 rounded-lg">
-                <p className="text-lg text-gray-700">{result}</p>
-              </div>
-            ) : (
-              <div className="p-6 bg-gray-50 rounded-lg">
-                <p className="text-lg text-gray-500">Hasil identifikasi akan muncul di sini setelah form disubmit.</p>
-              </div>
-            )}
-          </div>
+        <div className="bg-white rounded-xl shadow-2xl p-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Hasil Identifikasi</h2>
+          {result.length > 0 ? (
+            <div className="p-6 bg-gray-50 rounded-lg">
+              <table className="min-w-full text-left table-auto">
+                <thead>
+                  <tr>
+                    <th className="py-2 px-4 text-gray-600">Usia</th>
+                    <th className="py-2 px-4 text-gray-600">Tekanan Darah</th>
+                    <th className="py-2 px-4 text-gray-600">Kolesterol</th>
+                    <th className="py-2 px-4 text-gray-600">BMI</th>
+                    <th className="py-2 px-4 text-gray-600">Merokok</th>
+                    <th className="py-2 px-4 text-gray-600">Risiko</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.map((item, index) => (
+                    <tr key={index} className="border-t">
+                      <td className="py-2 px-4">{item.usia}</td>
+                      <td className="py-2 px-4">{item.tekananDarah}</td>
+                      <td className="py-2 px-4">{item.kolesterol}</td>
+                      <td className="py-2 px-4">{item.bmi}</td>
+                      <td className="py-2 px-4">{item.merokok}</td>
+                      <td className="py-2 px-4">{item.risiko}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-gray-600">Belum ada hasil yang tersedia.</p>
+          )}
         </div>
       </div>
+
+      {/* Floating Reload Button */}
+      <button 
+        onClick={fetchData}
+        className="fixed bottom-8 right-8 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+      >
+        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      </button>
     </div>
   );
 }

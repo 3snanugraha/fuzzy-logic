@@ -1,31 +1,50 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import path from 'path';
+import fs from 'fs';
 import { fuzzyDecision } from '../../utils/fuzzyLogic';
 import { readExcelFile } from '../../utils/readExcel';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { file } = req.query;
-
-  if (!file) {
-    return res.status(400).json({ error: 'File Excel diperlukan.' });
-  }
-
   try {
-    // Membaca data dari file Excel yang disertakan di query parameter
-    const filePath = `./public/data/${file}`;
+    console.log('Reading Excel file...');
+    
+    // Correct path resolution using path.join for compatibility
+    const filePath = path.join(process.cwd(), 'public', 'data', 'data_pasien.xlsx');
+    
+    // Log file path for debugging purposes
+    console.log('File path:', filePath);
+    
+    // Check if the file exists
+    if (!fs.existsSync(filePath)) {
+      console.error('Excel file not found at the specified path:', filePath);
+      return res.status(404).json({ error: 'Excel file not found' });
+    }
+
+    // Reading the Excel file
+    console.log('Attempting to read Excel file...');
     const patientData = await readExcelFile(filePath);
 
-    // Mengolah data pasien dengan inferensi fuzzy
-    const results = patientData.map(patient => {
-      const { usia, tekananDarah, kolesterol, bmi, merokok } = patient;
+    // Log the data to verify it was read correctly
+    console.log('Excel Data:', patientData);
 
-      // Memproses data dengan fuzzy logic
+    if (!patientData || patientData.length === 0) {
+      console.error('No data found in the Excel file.');
+      return res.status(400).json({ error: 'No valid data in Excel file.' });
+    }
+
+    // Process patient data with fuzzy logic
+    const results = patientData.map((patient, index) => {
+      const { usia, tekananDarah, kolesterol, bmi, merokok } = patient;
       const result = fuzzyDecision(usia, tekananDarah, kolesterol, bmi, merokok);
-      return { usia, tekananDarah, kolesterol, bmi, merokok, risiko: result };
+      return { id: index + 1, usia, tekananDarah, kolesterol, bmi, merokok, risiko: result };
     });
 
-    // Mengirimkan hasil perhitungan risiko
+    console.log('Results:', results);
+
+    // Sending the results back as JSON response
     res.status(200).json({ data: results });
   } catch (error) {
+    console.error('Error in API handler:', error);
     res.status(500).json({ error: 'Terjadi kesalahan dalam memproses file Excel.' });
   }
 }
