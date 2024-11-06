@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react';
 export default function Home() {
   const [result, setResult] = useState<any[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       console.log('Fetching data from /api/fuzzy...');
       
       const res = await fetch('/api/fuzzy');
@@ -26,6 +28,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -40,6 +44,11 @@ export default function Home() {
       <nav className="bg-white shadow-md px-4 py-3">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="text-gray-800 font-bold text-xl">Fuzzy System</div>
+          <div className="hidden md:flex space-x-6">
+            <a href="/" className="text-gray-800 hover:text-blue-600">Diagnosis</a>
+            <a href="/dataset" className="text-gray-800 hover:text-blue-600">Dataset</a>
+            <a href="/bantuan" className="text-gray-800 hover:text-blue-600">Bantuan</a>
+          </div>
           <div className="md:hidden">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-800">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,9 +59,9 @@ export default function Home() {
         </div>
         {isMenuOpen && (
           <div className="md:hidden mt-2">
-            <a href="#" className="block text-gray-800 py-2">Home</a>
-            <a href="#" className="block text-gray-800 py-2">About</a>
-            <a href="#" className="block text-gray-800 py-2">Contact</a>
+            <a href="/" className="block text-gray-800 py-2">Diagnosis</a>
+            <a href="/dataset" className="block text-gray-800 py-2">Dataset</a>
+            <a href="/bantuan" className="block text-gray-800 py-2">Bantuan</a>
           </div>
         )}
       </nav>
@@ -72,36 +81,44 @@ export default function Home() {
       {/* Result Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="bg-white rounded-xl shadow-2xl p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Hasil Identifikasi</h2>
-          {result.length > 0 ? (
-            <div className="p-6 bg-gray-50 rounded-lg">
-              <table className="min-w-full text-left table-auto">
-                <thead>
-                  <tr>
-                    <th className="py-2 px-4 text-gray-600">Usia</th>
-                    <th className="py-2 px-4 text-gray-600">Tekanan Darah</th>
-                    <th className="py-2 px-4 text-gray-600">Kolesterol</th>
-                    <th className="py-2 px-4 text-gray-600">BMI</th>
-                    <th className="py-2 px-4 text-gray-600">Merokok</th>
-                    <th className="py-2 px-4 text-gray-600">Risiko</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.map((item, index) => (
-                    <tr key={index} className="border-t">
-                      <td className="py-2 px-4">{item.usia}</td>
-                      <td className="py-2 px-4">{item.tekananDarah}</td>
-                      <td className="py-2 px-4">{item.kolesterol}</td>
-                      <td className="py-2 px-4">{item.bmi}</td>
-                      <td className="py-2 px-4">{item.merokok}</td>
-                      <td className="py-2 px-4">{item.risiko}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Hasil Identifikasi</h2>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+          ) : result.length > 0 ? (
+            <div className="overflow-x-auto">
+              <div className="inline-block min-w-full align-middle">
+                <div className="overflow-hidden shadow-sm ring-1 ring-black ring-opacity-5">
+                  <table className="min-w-full divide-y divide-gray-300">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Usia</th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Tekanan Darah</th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kolesterol</th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">BMI</th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Merokok</th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Risiko</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 bg-white">
+                      {result.map((item, index) => (
+                        <tr key={index}>
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">{item.usia}</td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.tekananDarah}</td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.kolesterol}</td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.bmi}</td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.merokok}</td>
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.risiko}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           ) : (
-            <p className="text-gray-600">Belum ada hasil yang tersedia.</p>
+            <p className="text-gray-600 text-center">Belum ada hasil yang tersedia.</p>
           )}
         </div>
       </div>
