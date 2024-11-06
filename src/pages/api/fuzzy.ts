@@ -35,15 +35,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Process patient data with fuzzy logic
     const results = patientData.map((patient, index) => {
       const { usia, tekananDarah, kolesterol, bmi, merokok } = patient as { usia: string; tekananDarah: string; kolesterol: string; bmi: string; merokok: string };
-      const result = fuzzyDecision(
-        parseFloat(usia), 
-        tekananDarah, 
-        parseFloat(kolesterol), 
-        parseFloat(bmi), 
-        parseInt(merokok)
-      );
-      return { id: index, usia, tekananDarah, kolesterol, bmi, merokok, risiko: result };
+
+      // Ensure all data is parsed as expected
+      const usiaParsed = parseFloat(usia);
+      const kolesterolParsed = parseFloat(kolesterol);
+      const bmiParsed = parseFloat(bmi);
+      const merokokParsed = parseInt(merokok);
+
+      // Validate data before processing
+      if (isNaN(usiaParsed) || isNaN(kolesterolParsed) || isNaN(bmiParsed) || isNaN(merokokParsed)) {
+        console.error('Invalid data for patient:', patient);
+        return { id: index, error: 'Invalid data' };
+      }
+
+      const result = fuzzyDecision(usiaParsed, tekananDarah, kolesterolParsed, bmiParsed, merokokParsed);
+
+      return { id: index, usia: usiaParsed, tekananDarah, kolesterol: kolesterolParsed, bmi: bmiParsed, merokok: merokokParsed, risiko: result };
     });
+
     console.log('Results:', results);
 
     // Sending the results back as JSON response
