@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { fuzzyDecision } from '../utils/fuzzyLogic';
 import Link from 'next/link';
 import { adminLogin, getClientPocketBase } from '../../services/authManager';
+import { useRouter } from 'next/router';
 
 // Define the interface for result items
 interface ResultItem {
@@ -31,6 +32,7 @@ interface InputData {
 
 // Modify the Home component
 export default function Home() {
+  const router = useRouter();
   const [inputData, setInputData] = useState<InputData>({
     age: '',
     blood_pressure: '',
@@ -85,7 +87,7 @@ export default function Home() {
       
       // Save to PocketBase after admin authentication
       const pb = getClientPocketBase();
-      await pb.collection('cardiovascular_risk_assessments').create({
+      const record = await pb.collection('cardiovascular_risk_assessments').create({
         assessment_date: new Date().toISOString().split('T')[0],
         age: inputData.age,
         blood_pressure: inputData.blood_pressure,
@@ -95,6 +97,9 @@ export default function Home() {
         risk_score: riskValue.toString(),
         risk_level: riskLevel
       });
+
+      // Add this line after the record is created
+      router.push(`/result/${record.id}`);
 
       // Clear form after successful submission
       setInputData({
@@ -157,7 +162,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Result Section */}
+      {/* Form Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="bg-white rounded-xl shadow-2xl p-8 pb-20">
           <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Lengkapi Formulir Berikut Untuk Menganalisis</h2>
@@ -171,7 +176,7 @@ export default function Home() {
                   name="age"
                   value={inputData.age}
                   onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg"
+                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
                   placeholder="Contoh: 45"
                 />
               </div>
@@ -183,7 +188,7 @@ export default function Home() {
                   name="blood_pressure"
                   value={inputData.blood_pressure}
                   onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg"
+                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
                   placeholder="Contoh: 130"
                 />
               </div>
@@ -195,7 +200,7 @@ export default function Home() {
                   name="cholesterol"
                   value={inputData.cholesterol}
                   onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg"
+                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
                   placeholder="Contoh: 220"
                 />
               </div>
@@ -207,7 +212,7 @@ export default function Home() {
                   name="bmi"
                   value={inputData.bmi}
                   onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg"
+                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
                   placeholder="Contoh: 27"
                   step="0.1"
                 />
@@ -220,7 +225,7 @@ export default function Home() {
                   name="smoking_history"
                   value={inputData.smoking_history}
                   onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg"
+                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
                   placeholder="Contoh: 8"
                 />
               </div>
