@@ -106,43 +106,60 @@ export default function History() {
     )
   );
 
+  // Fungsi untuk menutup menu saat link diklik
+  const closeMenu = () => setIsMenuOpen(false);
+
   return (
     <div className="min-h-screen bg-white">
-      <nav className="bg-white shadow-md px-4 py-3 relative z-10">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="text-gray-800 font-bold text-xl">History</div>
-          
-          {/* Mobile Menu Button */}
-          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-6">
-            <Link href="/" className="text-gray-800 hover:text-blue-600">Beranda</Link>
-            <Link href="/bantuan" className="text-gray-800 hover:text-blue-600">Bantuan</Link>
+      <nav className="bg-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <span className="text-gray-800 font-bold text-xl">Riwayat</span>
+              </div>
+            </div>
+            <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
+              <Link href="/" className="text-gray-800 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                Beranda
+              </Link>
+              <Link href="/bantuan" className="text-gray-800 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                Bantuan
+              </Link>
+            </div>
+            <div className="-mr-2 flex items-center md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              >
+                <span className="sr-only">Open main menu</span>
+                {isMenuOpen ? (
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Mobile Menu with Slide-In Animation */}
-        <div
-          className={`transition-transform duration-300 ease-in-out transform ${
-            isMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
-          } absolute top-full left-0 right-0 bg-white shadow-lg md:hidden`}
-        >
-          <div className="flex flex-col p-4 space-y-3">
-            <Link href="/" className="text-gray-800 hover:text-blue-600">Beranda</Link>
-            <Link href="/bantuan" className="text-gray-800 hover:text-blue-600">Bantuan</Link>
+        {/* Mobile menu, show/hide based on menu state */}
+        <div className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden`}>
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <Link href="/" className="text-gray-800 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={closeMenu}>
+              Beranda
+            </Link>
+            <Link href="/bantuan" className="text-gray-800 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium" onClick={closeMenu}>
+              Bantuan
+            </Link>
           </div>
         </div>
       </nav>
-      
+
       <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 py-16 md:py-32">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl md:text-5xl font-bold text-white text-center mb-6">
@@ -159,19 +176,62 @@ export default function History() {
           <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-6 text-center">History Identifikasi</h2>
           
           <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <input
-              type="text"
-              placeholder="Cari data..."
-              className="w-full md:flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button
-              onClick={handleExportResults}
-              className="w-full md:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg transition-all duration-300"
-            >
-              Export (.xlsx)
-            </button>
+            <div className="relative flex-1">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Cari data..."
+                className="w-full pl-10 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex flex-col md:flex-row gap-2">
+              <Link 
+                href="/" 
+                className="group w-full md:w-auto px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg shadow-lg transition-all duration-300 text-center flex items-center justify-center space-x-2 hover:transform hover:scale-105"
+              >
+                <svg 
+                  className="h-5 w-5 transform group-hover:rotate-12 transition-transform duration-300" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+                  />
+                </svg>
+                <span>Analisa Lagi</span>
+              </Link>
+
+              <button
+                onClick={handleExportResults}
+                className="group w-full md:w-auto px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 hover:transform hover:scale-105"
+              >
+                <svg 
+                  className="h-5 w-5 transform group-hover:-translate-y-1 transition-transform duration-300" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+                  />
+                </svg>
+                <span>Export (.xlsx)</span>
+              </button>
+            </div>
           </div>
           
           {isLoading ? (

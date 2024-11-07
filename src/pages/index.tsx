@@ -48,7 +48,7 @@ export default function Home() {
       // Calculate risk using fuzzyLogic
       const riskValue = fuzzyDecision(
         parseFloat(inputData.age),
-        inputData.blood_pressure,
+        parseFloat(inputData.blood_pressure),
         parseFloat(inputData.cholesterol),
         parseFloat(inputData.bmi),
         parseFloat(inputData.smoking_history)
@@ -161,7 +161,7 @@ export default function Home() {
               <div className="transform hover:scale-105 transition-transform duration-300">
                 <label className="block text-lg font-semibold text-gray-700 mb-2">Tekanan Darah (mmHg)</label>
                 <input
-                  type="text"
+                  type="number"
                   name="blood_pressure"
                   value={inputData.blood_pressure}
                   onChange={handleInputChange}
