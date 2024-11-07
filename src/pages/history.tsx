@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { getClientPocketBase } from '../../services/authManager';
 import { exportToExcel } from '../utils/exportExcel';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Define the interface for result items
 interface ResultItem {
@@ -160,13 +161,20 @@ export default function History() {
         </div>
       </nav>
 
-      <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 py-16 md:py-32">
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 py-32 rounded-b-3xl">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl md:text-5xl font-bold text-white text-center mb-6">
-            Riwayat Identifikasi Penyakit Kardiovaskular
-          </h1>
-          <p className="text-lg md:text-xl text-blue-100 text-center">
-            Lihat dan kelola riwayat hasil identifikasi penyakit kardiovaskular
+        <div className="flex justify-center">
+          <Image 
+            src="/hero.svg" 
+            alt="Cardiovascular Risk Assessment" 
+            width={250}  // Ubah ukuran sesuai kebutuhan
+            height={50} // Ubah ukuran sesuai kebutuhan
+            className="h-auto mb-3" // Menggunakan w-auto untuk menjaga rasio aspek
+          />
+        </div>
+          <p className="text-xl text-blue-100 text-center">
+              Lihat dan kelola riwayat hasil identifikasi penyakit kardiovaskular
           </p>
         </div>
       </div>

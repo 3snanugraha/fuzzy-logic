@@ -3,6 +3,7 @@ import { fuzzyDecision } from '../utils/fuzzyLogic';
 import Link from 'next/link';
 import { adminLogin, getClientPocketBase } from '../../services/authManager';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 
 // Add this interface at the top
@@ -128,11 +129,17 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 py-32">
+      <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 py-32 rounded-b-3xl">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-white text-center mb-6">
-            Sistem Identifikasi Penyakit Kardiovaskular dengan Fuzzy Tsukamoto
-          </h1>
+        <div className="flex justify-center">
+          <Image 
+            src="/hero.svg" 
+            alt="Cardiovascular Risk Assessment" 
+            width={250}  // Ubah ukuran sesuai kebutuhan
+            height={50} // Ubah ukuran sesuai kebutuhan
+            className="h-auto mb-3" // Menggunakan w-auto untuk menjaga rasio aspek
+          />
+        </div>
           <p className="text-xl text-blue-100 text-center">
             Identifikasi penyakit kardiovaskular menggunakan metode fuzzy yang akurat dan efisien
           </p>
