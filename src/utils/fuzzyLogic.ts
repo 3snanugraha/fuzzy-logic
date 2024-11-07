@@ -1,3 +1,9 @@
+// Umur: 45 (dalam tahun)
+// Tekanan Darah: 130 (dalam mmHg)
+// Kolesterol: 220 (dalam mg/dL)
+// BMI: 27 (angka)
+// Riwayat Merokok: 8 (jumlah tahun merokok)
+
 interface FuzzyResult {
   low?: number;
   medium?: number;

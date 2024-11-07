@@ -144,8 +144,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="text-gray-800 font-bold text-xl">Fuzzy System</div>
           <div className="hidden md:flex space-x-6">
-            <Link href="/" className="text-gray-800 hover:text-blue-600">Diagnosis</Link>
-            <Link href="/dataset" className="text-gray-800 hover:text-blue-600">Dataset</Link>
+            <Link href="/history" className="text-gray-800 hover:text-blue-600">Riwayat</Link>
             <Link href="/bantuan" className="text-gray-800 hover:text-blue-600">Bantuan</Link>
           </div>
           <div className="md:hidden">
@@ -159,7 +158,7 @@ export default function Home() {
         {isMenuOpen && (
           <div className="md:hidden mt-2">
             <Link href="/" className="block text-gray-800 py-2">Diagnosis</Link>
-            <Link href="/dataset" className="block text-gray-800 py-2">Dataset</Link>
+            <Link href="/history" className="block text-gray-800 py-2">Riwayat</Link>
             <Link href="/bantuan" className="block text-gray-800 py-2">Bantuan</Link>
           </div>
         )}
