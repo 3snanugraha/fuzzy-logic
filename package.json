@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/env": "^15.0.3",
     "chart.js": "^4.4.6",
     "depcheck": "^1.4.7",
     "next": "15.0.2",

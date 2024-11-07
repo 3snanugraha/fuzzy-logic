@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { useState, useEffect } from 'react';
-import { getClientPocketBase } from './services/authManager';
+import { getClientPocketBase } from '../../services/authManager';
 import { exportToExcel } from '../utils/exportExcel';
 import Link from 'next/link';
 

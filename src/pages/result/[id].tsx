@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { getClientPocketBase } from '../services/authManager';
+import { getClientPocketBase } from '../../../services/authManager';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartOptions } from 'chart.js';
