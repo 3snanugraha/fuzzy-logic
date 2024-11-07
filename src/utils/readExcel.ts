@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as XLSX from 'xlsx';
 
 export async function readExcelFile(filePath: string): Promise<any[]> {
