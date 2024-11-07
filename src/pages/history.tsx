@@ -21,6 +21,7 @@ interface ResultItem {
 export default function History() {
   const [result, setResult] = useState<ResultItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: string }>({ key: '', direction: '' });
 
@@ -76,24 +77,7 @@ export default function History() {
   }, []);
 
   const handleExportResults = () => {
-    // const exportData = result.map(item => ({
-    //   ID: parseInt(item.id),
-    //   'Tanggal Assessment': item.assessment_date,
-    //   Usia: parseInt(item.age),
-    //   'Tekanan Darah': item.blood_pressure,
-    //   Kolesterol: parseInt(item.cholesterol),
-    //   BMI: parseFloat(item.bmi),
-    //   Merokok: item.smoking_history,
-    //   'Nilai Risiko': parseFloat(item.risk_score),
-    //   'Keterangan Risiko': item.risk_level,
-    // }));
-
-    // if (exportData.length === 0) {
-    //   console.warn("No data available to export.");
-    //   return;
-    // }
-
-    // exportToExcel(exportData, 'hasil-history');
+ 
   };
 
   const handleSort = (key: string) => {
@@ -124,16 +108,41 @@ export default function History() {
 
   return (
     <div className="min-h-screen bg-white">
-      <nav className="bg-white shadow-md px-4 py-3">
+      <nav className="bg-white shadow-md px-4 py-3 relative z-10">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="text-gray-800 font-bold text-xl">History</div>
+          
+          {/* Mobile Menu Button */}
+          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+
+          {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6">
             <Link href="/" className="text-gray-800 hover:text-blue-600">Beranda</Link>
             <Link href="/bantuan" className="text-gray-800 hover:text-blue-600">Bantuan</Link>
           </div>
         </div>
-      </nav>
 
+        {/* Mobile Menu with Slide-In Animation */}
+        <div
+          className={`transition-transform duration-300 ease-in-out transform ${
+            isMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+          } absolute top-full left-0 right-0 bg-white shadow-lg md:hidden`}
+        >
+          <div className="flex flex-col p-4 space-y-3">
+            <Link href="/" className="text-gray-800 hover:text-blue-600">Beranda</Link>
+            <Link href="/bantuan" className="text-gray-800 hover:text-blue-600">Bantuan</Link>
+          </div>
+        </div>
+      </nav>
+      
       <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 py-16 md:py-32">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl md:text-5xl font-bold text-white text-center mb-6">

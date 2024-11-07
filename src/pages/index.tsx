@@ -1,25 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { fuzzyDecision } from '../utils/fuzzyLogic';
 import Link from 'next/link';
 import { adminLogin, getClientPocketBase } from '../../services/authManager';
 import { useRouter } from 'next/router';
 
-// Define the interface for result items
-interface ResultItem {
-  id: number;
-  usia: number;
-  tekananDarah: number;
-  kolesterol: number;
-  bmi: number;
-  merokok: number;
-  risiko: number;
-  keterangan: string;
-}
-
-// Define the structure for the API response data
-interface ApiResponse {
-  data: ResultItem[];  // The API response contains an array of ResultItem
-}
 
 // Add this interface at the top
 interface InputData {
@@ -41,18 +25,11 @@ export default function Home() {
     smoking_history: ''
   });
   
-  const [result, setResult] = useState<ResultItem[]>([]);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: string }>({ key: '', direction: '' });
   // Keep existing states but add loading state for processing
   const [isProcessing, setIsProcessing] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
