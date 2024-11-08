@@ -18,15 +18,18 @@ interface FuzzyRule {
 function fuzzyMembership(value: number, low: number, medium: number, high: number): FuzzyResult {
   const result: FuzzyResult = {};
 
+  // Low membership
   if (value <= low) result.low = 1;
   else if (value <= medium) result.low = (medium - value) / (medium - low);
   else result.low = 0;
 
+  // Medium membership
   if (value <= low || value >= high) result.medium = 0;
   else if (value <= medium) result.medium = (value - low) / (medium - low);
   else if (value < high) result.medium = (high - value) / (high - medium);
   else result.medium = 1;
 
+  // High membership
   if (value >= high) result.high = 1;
   else if (value > medium) result.high = (value - medium) / (high - medium);
   else result.high = 0;
@@ -57,6 +60,7 @@ function categorizeMerokok(merokok: number): FuzzyResult {
   return { high: 1 };
 }
 
+// Fuzzy rules combining all factors
 function fuzzyRules(input1: FuzzyResult, input2: FuzzyResult, input3: FuzzyResult, input4: FuzzyResult, input5: FuzzyResult): FuzzyRule[] {
   const rules: FuzzyRule[] = [];
 
@@ -112,6 +116,7 @@ function defuzzification(rules: FuzzyRule[]): number {
   return denominator === 0 ? 50 : Math.max(0, Math.min(100, numerator / denominator));
 }
 
+// Main fuzzy decision function
 export function fuzzyDecision(
   umur: number,
   tekananDarah: number,
@@ -128,6 +133,3 @@ export function fuzzyDecision(
   const rules = fuzzyRules(fuzzyUmur, fuzzyTekananDarah, fuzzyKolesterol, fuzzyBMI, fuzzyMerokok);
   return defuzzification(rules);
 }
-
-
-

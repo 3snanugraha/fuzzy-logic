@@ -5,8 +5,7 @@ import { adminLogin, getClientPocketBase } from '../../services/authManager';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 
-
-// Add this interface at the top
+// Interface for the form input data
 interface InputData {
   age: string;
   blood_pressure: string;
@@ -15,7 +14,7 @@ interface InputData {
   smoking_history: string;
 }
 
-// Modify the Home component
+// Main Home component
 export default function Home() {
   const router = useRouter();
   const [inputData, setInputData] = useState<InputData>({
@@ -25,13 +24,11 @@ export default function Home() {
     bmi: '',
     smoking_history: ''
   });
-  
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // Keep existing states but add loading state for processing
   const [isProcessing, setIsProcessing] = useState(false);
 
-
+  // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInputData(prev => ({
@@ -40,13 +37,32 @@ export default function Home() {
     }));
   };
 
+  // Validate form data
+  const validateForm = () => {
+    return Object.values(inputData).every(value => value.trim() !== '');
+  };
+
+  // Test data
+  // const testData = () => {
+  //   const hasil = fuzzyDecision(60,266,260,67,27);
+  //   return hasil;
+  // }
+
+  // console.log(testData());
+
+  // Process the form submission
   const handleProcess = async () => {
+    if (!validateForm()) {
+      alert('Harap lengkapi semua data!');
+      return;
+    }
+
     setIsProcessing(true);
     try {
       // Login as admin first
       await adminLogin();
       
-      // Calculate risk using fuzzyLogic
+      // Calculate risk using fuzzy logic
       const riskValue = fuzzyDecision(
         parseFloat(inputData.age),
         parseFloat(inputData.blood_pressure),
@@ -62,8 +78,8 @@ export default function Home() {
       } else if (riskValue >= 50) {
         riskLevel = 'Sedang';
       }
-      
-      // Save to PocketBase after admin authentication
+
+      // Save to PocketBase
       const pb = getClientPocketBase();
       const record = await pb.collection('cardiovascular_risk_assessments').create({
         assessment_date: new Date().toISOString().split('T')[0],
@@ -76,7 +92,7 @@ export default function Home() {
         risk_level: riskLevel
       });
 
-      // Add this line after the record is created
+      // Navigate to result page
       router.push(`/result/${record.id}`);
 
       // Clear form after successful submission
@@ -89,7 +105,6 @@ export default function Home() {
       });
 
       alert('Data berhasil diproses!');
-
     } catch (error) {
       console.error('Error processing data:', error);
       alert('Terjadi kesalahan saat memproses data');
@@ -101,7 +116,7 @@ export default function Home() {
   const fetchData = async () => {
     console.log('Belum ada fitur');
   };
-  
+
   return (
     <div className="min-h-screen bg-white relative">
       {/* Navigation */}
@@ -131,15 +146,15 @@ export default function Home() {
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 py-32 rounded-b-3xl">
         <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-center">
-          <Image 
-            src="/hero.svg" 
-            alt="Cardiovascular Risk Assessment" 
-            width={250}  // Ubah ukuran sesuai kebutuhan
-            height={50} // Ubah ukuran sesuai kebutuhan
-            className="h-auto mb-3" // Menggunakan w-auto untuk menjaga rasio aspek
-          />
-        </div>
+          <div className="flex justify-center">
+            <Image
+              src="/hero.svg"
+              alt="Cardiovascular Risk Assessment"
+              width={250}
+              height={50}
+              className="h-auto mb-3"
+            />
+          </div>
           <p className="text-xl text-blue-100 text-center">
             Identifikasi penyakit kardiovaskular menggunakan metode fuzzy yang akurat dan efisien
           </p>
@@ -150,69 +165,29 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="bg-white rounded-xl shadow-2xl p-8 pb-20">
           <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Lengkapi Formulir Berikut Untuk Menganalisis</h2>
-        
+
           <div className="max-w-3xl mx-auto space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="transform hover:scale-105 transition-transform duration-300">
-                <label className="block text-lg font-semibold text-gray-700 mb-2">Umur (tahun)</label>
-                <input
-                  type="number"
-                  name="age"
-                  value={inputData.age}
-                  onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
-                  placeholder="Contoh: 45"
-                />
-              </div>
-
-              <div className="transform hover:scale-105 transition-transform duration-300">
-                <label className="block text-lg font-semibold text-gray-700 mb-2">Tekanan Darah (mmHg)</label>
-                <input
-                  type="number"
-                  name="blood_pressure"
-                  value={inputData.blood_pressure}
-                  onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
-                  placeholder="Contoh: 130"
-                />
-              </div>
-
-              <div className="transform hover:scale-105 transition-transform duration-300">
-                <label className="block text-lg font-semibold text-gray-700 mb-2">Kolesterol (mg/dL)</label>
-                <input
-                  type="number"
-                  name="cholesterol"
-                  value={inputData.cholesterol}
-                  onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
-                  placeholder="Contoh: 220"
-                />
-              </div>
-
-              <div className="transform hover:scale-105 transition-transform duration-300">
-                <label className="block text-lg font-semibold text-gray-700 mb-2">BMI</label>
-                <input
-                  type="number"
-                  name="bmi"
-                  value={inputData.bmi}
-                  onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
-                  placeholder="Contoh: 27"
-                  step="0.1"
-                />
-              </div>
-
-              <div className="transform hover:scale-105 transition-transform duration-300 md:col-span-2">
-                <label className="block text-lg font-semibold text-gray-700 mb-2">Riwayat Merokok (tahun)</label>
-                <input
-                  type="number"
-                  name="smoking_history"
-                  value={inputData.smoking_history}
-                  onChange={handleInputChange}
-                  className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
-                  placeholder="Contoh: 8"
-                />
-              </div>
+              {['age', 'blood_pressure', 'cholesterol', 'bmi', 'smoking_history'].map((field, index) => (
+                <div key={index} className="transform hover:scale-105 transition-transform duration-300">
+                  <label className="block text-lg font-semibold text-gray-700 mb-2">
+                    {field === 'age' && 'Umur (tahun)'}
+                    {field === 'blood_pressure' && 'Tekanan Darah (mmHg)'}
+                    {field === 'cholesterol' && 'Kolesterol (mg/dL)'}
+                    {field === 'bmi' && 'BMI'}
+                    {field === 'smoking_history' && 'Riwayat Merokok (tahun)'}
+                  </label>
+                  <input
+                    type="number"
+                    name={field}
+                    value={inputData[field as keyof InputData]}
+                    onChange={handleInputChange}
+                    className="mt-2 block w-full rounded-lg border-2 border-gray-300 shadow-lg focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-lg text-black"
+                    placeholder={`Input hanya angka..`}
+                    step={field === 'bmi' ? '0.1' : undefined}
+                  />
+                </div>
+              ))}
             </div>
 
             <button
@@ -234,12 +209,13 @@ export default function Home() {
                   </svg>
                 </span>
               ) : 'Proses'}
-            </button>          </div>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Floating Reload Button */}
-      <button 
+      <button
         onClick={fetchData}
         className="fixed bottom-8 right-8 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-all duration-300 hover:scale-110"
       >
